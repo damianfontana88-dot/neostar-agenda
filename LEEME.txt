@@ -1,0 +1,19 @@
+NEOSTAR - Agenda personal
+
+CONTENIDO
+- index.html: aplicación.
+- manifest.webmanifest: configuración instalable.
+- sw.js: soporte básico sin conexión.
+
+CÓMO PROBAR
+1. Descomprimí el ZIP.
+2. Abrí index.html en un navegador para probar las funciones básicas.
+3. Para instalarla como PWA y habilitar el modo sin conexión, publicá estos archivos en un hosting HTTPS.
+4. Abrí la dirección HTTPS desde Chrome en Android y elegí "Instalar aplicación" o "Agregar a pantalla principal".
+
+DATOS Y LIMITACIONES
+- Tareas, trabajos, notas y hábitos se guardan en el almacenamiento local del navegador del dispositivo.
+- Usá "Exportar copia de seguridad" para guardar tus datos en un archivo.
+- El cronómetro acumula tiempo por trabajo, pero no es un sistema de fichaje laboral validado.
+- Esta versión no tiene sincronización en la nube ni recordatorios programados garantizados cuando la app está cerrada.
+- No ingreses datos personales sensibles de clientes.
