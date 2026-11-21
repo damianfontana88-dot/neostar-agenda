@@ -26,6 +26,10 @@ button.primary{background:var(--red);color:white;border:0;border-radius:10px;pad
 button.secondary{background:#f3f4f6;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-weight:650}
 button.danger{color:#b4232a;background:#fff1f1;border:1px solid #ffd4d4;border-radius:9px;padding:8px}
 .item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.priority-urgent{background:#fff0f0;border-left:6px solid #c62828;padding:10px 9px;border-radius:8px;margin:8px 0;box-shadow:0 1px 4px #c6282818}
+.priority-high{background:#fff4e5;border-left:6px solid #ef8b18;padding:10px 9px;border-radius:8px;margin:8px 0}
+.priority-normal{background:#fffbe5;border-left:6px solid #e3bf27;padding:10px 9px;border-radius:8px;margin:8px 0}
+.priority-low{background:#eef8f0;border-left:6px solid #25864a;padding:10px 9px;border-radius:8px;margin:8px 0}
 .item:last-child{border:0}.item input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--red)}
 .item .desc{flex:1}.done{text-decoration:line-through;color:#9299a2}
 .meta{font-size:12px;color:var(--muted);margin-top:3px}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
@@ -54,7 +58,7 @@ footer{text-align:center;color:#9ca3af;font-size:11px;padding:20px}
 <section id="hoy" class="panel">
 <h2>Mi día</h2>
 <label for="taskText">Nueva tarea</label><input id="taskText" placeholder="Ej. Revisar turnos y trabajos pendientes">
-<div class="row"><div><label for="taskDate">Fecha</label><input id="taskDate" type="date"></div><div><label for="taskPriority">Prioridad</label><select id="taskPriority"><option>Normal</option><option>Alta</option><option>Urgente</option></select></div></div>
+<div class="row"><div><label for="taskDate">Fecha</label><input id="taskDate" type="date"></div><div><label for="taskPriority">Prioridad</label><select id="taskPriority"><option>Baja</option><option>Normal</option><option>Alta</option><option>Urgente</option></select></div></div>
 <button class="primary" id="addTask">+ Agregar tarea</button>
 <h3 style="margin-top:20px">Mis pendientes</h3><div id="taskList"></div>
 </section>
@@ -114,9 +118,10 @@ document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()
 $('addTask').onclick=()=>{let text=$('taskText').value.trim();if(!text)return;data.tasks.push({id:crypto.randomUUID(),text,date:$('taskDate').value,priority:$('taskPriority').value,done:false});$('taskText').value='';save();render();};
 function renderTasks(){
  let list=$('taskList');list.innerHTML='';
- let tasks=[...data.tasks].sort((a,b)=>(a.done-b.done)||((a.date||'').localeCompare(b.date||'')));
+ const rank={'Urgente':0,'Alta':1,'Normal':2,'Baja':3};
+ let tasks=[...data.tasks].sort((a,b)=>(a.done-b.done)||(rank[a.priority]??2)-(rank[b.priority]??2)||((a.date||'').localeCompare(b.date||''));
  if(!tasks.length){list.innerHTML='<div class="empty">Todavía no tenés tareas cargadas.</div>';return}
- tasks.forEach(t=>{let d=document.createElement('div');d.className='item';let c=document.createElement('input');c.type='checkbox';c.checked=t.done;c.onchange=()=>{t.done=c.checked;save();render()};let box=document.createElement('div');box.className='desc';let title=document.createElement('div');title.textContent=t.text;if(t.done)title.className='done';let meta=document.createElement('div');meta.className='meta';meta.textContent=(t.date||'Sin fecha')+' · '+t.priority;box.append(title,meta);let del=document.createElement('button');del.className='danger';del.textContent='×';del.onclick=()=>{data.tasks=data.tasks.filter(x=>x.id!==t.id);save();render()};d.append(c,box,del);list.append(d)});
+ tasks.forEach(t=>{let d=document.createElement('div');d.className='item '+({'Urgente':'priority-urgent','Alta':'priority-high','Normal':'priority-normal','Baja':'priority-low'}[t.priority]||'priority-normal');let c=document.createElement('input');c.type='checkbox';c.checked=t.done;c.onchange=()=>{t.done=c.checked;save();render()};let box=document.createElement('div');box.className='desc';let title=document.createElement('div');title.textContent=t.text;if(t.done)title.className='done';let meta=document.createElement('div');meta.className='meta';meta.textContent=(t.date||'Sin fecha')+' · '+t.priority;let badge=document.createElement('span');badge.className='tag';badge.style.marginTop='5px';badge.style.display='inline-block';badge.textContent=({'Urgente':'🔴 URGENTE','Alta':'🟠 ALTA','Normal':'🟡 NORMAL','Baja':'🟢 BAJA'}[t.priority]||'🟡 NORMAL');box.append(title,meta,badge);let del=document.createElement('button');del.className='danger';del.textContent='×';del.onclick=()=>{data.tasks=data.tasks.filter(x=>x.id!==t.id);save();render()};d.append(c,box,del);list.append(d)});
 }
 $('addJob').onclick=()=>{let car=$('car').value.trim(),work=$('work').value.trim();if(!car||!work)return;data.jobs.push({id:crypto.randomUUID(),car,work,mechanic:$('mechanic').value,status:$('jobStatus').value,seconds:0,runningSince:null});$('car').value='';$('work').value='';save();render();};
 function elapsed(j){return j.seconds+(j.runningSince?Math.max(0,Math.floor((Date.now()-j.runningSince)/1000)):0)}
